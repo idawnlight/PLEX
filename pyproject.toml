@@ -1,0 +1,17 @@
+[project]
+name = "PLEX"
+version = "0.1.0"
+description = "Tiny LALR(1) Lexical Analyzer in Python"
+authors = [
+    {name = "idawnlight", email = "idawn@live.com"},
+]
+dependencies = [
+    "networkx>=3.2.1",
+]
+requires-python = "==3.12.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+package-type = "library"

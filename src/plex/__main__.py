@@ -1,13 +1,36 @@
+import dill
+
 from lex import Lex
+
+test_input = """
+int main() {
+    float p    = 1.1;
+    int   i    = 2;
+    int   loop = 0;
+    int   a[10][10];
+    int   x;
+    while (loop == 0 && i <= 10) {
+        int j = 1;
+        while (loop == 0 && j < i)
+            if (a[i][j] == x)
+                loop = 1;
+            else
+                j = j + 1;
+        if (loop == 0)
+            i = i + 1;
+    }
+}
+"""
 
 
 class MyLanguage(Lex):
-    def __init__(self, source_code):
+    def __init__(self):
         super().__init__()
 
         # define the token specification
         self.token_specification = [
             # ('(a)(b)*', 'TEST'),
+            # ('/', 'TEST2')
 
             ('\n| ( )*', self.count_whitespace),
 
@@ -25,7 +48,6 @@ class MyLanguage(Lex):
             (r'else', "ELSE"),
             (r'while', "WHILE"),
             (r'for', "FOR"),
-            (r'return', "RETURN"),
             (r'break', "BREAK"),
             (r'continue', "CONTINUE"),
 
@@ -62,8 +84,8 @@ class MyLanguage(Lex):
         # user defined variables that may be used
         self.whitespaces = 0
 
-        # run the lexer
-        self._tokenize(source_code)
+        # init the lexer, generate MinimalDFA
+        self._init()
 
     def count_whitespace(self, token):
         self.whitespaces += 1
@@ -77,6 +99,10 @@ class MyLanguage(Lex):
 
 
 if __name__ == '__main__':
-    language = MyLanguage('')
-    # language.tokenize('')
-    # print(language.whitespaces)
+    language = MyLanguage()
+    dill.dump(language, open("language.p", "wb"))
+
+    # language = dill.load(open("language.p", "rb"))
+
+    language.tokenize(test_input)
+    print("\nAfter tokenize, whitespaces counted: " + str(language.whitespaces))

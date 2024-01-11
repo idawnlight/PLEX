@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Callable
 
 from automata import Automata
+from wrapper import CallWrapper
 
 
 class DFA:
@@ -9,9 +9,9 @@ class DFA:
     class DFAState:
         id: int
         states: set[int]
-        action: Callable | None
+        action: CallWrapper | None
 
-        def __init__(self, _id: int, states: set[int], action: Callable | None):
+        def __init__(self, _id: int, states: set[int], action: CallWrapper | None):
             self.id = _id
             self.states = states
             self.action = action
@@ -23,7 +23,7 @@ class DFA:
         transition_table: list[dict[str, int | None]] = []
         current_row = 0
 
-        print("start closure", self.nfa_epsilon_closure(0))
+        # print("start closure", self.nfa_epsilon_closure(0))
         start_closure = self.nfa_epsilon_closure(0)
         dfa_states.append(DFA.DFAState(current_row, start_closure, self.get_action(start_closure)))
 
@@ -75,7 +75,7 @@ class DFA:
             result.add(cur)
             visited.add(cur)
             for edge in self.nfa.graph[cur].items():
-                if edge[1]['label'] is None and edge[0] not in visited:
+                if edge[1][0]['label'] is None and edge[0] not in visited:
                     queue.append(edge[0])
         return result
 
@@ -83,7 +83,7 @@ class DFA:
     def nfa_char_closure(self, start: int, char: str) -> set[int]:
         char_result: set[int] = set()
         for edge in self.nfa.graph[start].items():
-            if edge[1]['label'] == char:
+            if edge[1][0]['label'] == char:
                 char_result.add(edge[0])
 
         result = set()
@@ -91,8 +91,86 @@ class DFA:
             result = result.union(self.nfa_epsilon_closure(state))
         return result
 
-    def get_action(self, nfa_states: set[int]) -> Callable | None:
+    def get_action(self, nfa_states: set[int]) -> CallWrapper | None:
         for state in nfa_states:
             if state in self.nfa.accept_states:
                 return self.nfa.accept_states[state]
         return None
+
+
+class MinimalDFA:
+    def __init__(self, dfa: Automata):
+        self.dfa = dfa
+        self.groups: list[set[int]] = []
+        self.result = Automata()
+        self.result.symbols = self.dfa.symbols
+
+        self.run_split()
+        self.generate_result()
+
+    def get_group(self, state: int) -> int:
+        for i in range(len(self.groups)):
+            if state in self.groups[i]:
+                return i
+        raise Exception("Invalid state")
+
+    def run_split(self):
+        # split into sets that end with one specific action and sets that don't
+        actions: set[CallWrapper] = set(self.dfa.accept_states.values())
+        for a in actions:
+            current_set: set[int] = set()
+            for state in self.dfa.accept_states:
+                if self.dfa.accept_states[state] == a:
+                    current_set.add(state)
+            self.groups.append(current_set)
+        current_set: set[int] = set()
+        for state in self.dfa.graph:
+            if state not in self.dfa.accept_states:
+                current_set.add(state)
+        self.groups.append(current_set)
+
+        # print("initial groups", self.groups)
+
+        # run with other symbols
+        while True:
+            prev_groups = self.groups
+            for symbol in self.dfa.symbols:
+                new_groups = []
+                for group in prev_groups:
+                    group_dict: dict[int, set[int]] = {}
+                    for state in group:
+                        next_state = None
+                        for edge in self.dfa.graph[state].items():
+                            if edge[1][0]['label'] == symbol:
+                                next_state = edge[0]
+                                break
+                        if next_state is None:
+                            new_groups.append({state})
+                            continue
+                        next_group = self.get_group(next_state)
+                        if next_group not in group_dict:
+                            group_dict[next_group] = set()
+                        group_dict[next_group].add(state)
+                    for g in group_dict:
+                        new_groups.append(group_dict[g])
+                # print("new groups", new_groups)
+                self.groups = new_groups
+            if self.groups == prev_groups:
+                break
+
+    def generate_result(self):
+        # print("final groups", self.groups)
+        existing_set = set()
+
+        for i in range(len(self.groups)):
+            if 0 in self.groups[i]:
+                self.result.start_state = i
+            for state in self.groups[i]:
+                for edge in self.dfa.graph[state].items():
+                    # print(i, self.get_group(edge[0]), edge[1][0]['label'])
+                    if (i, self.get_group(edge[0]), edge[1][0]['label']) not in existing_set:
+                        existing_set.add((i, self.get_group(edge[0]), edge[1][0]['label']))
+                        self.result.add_edge(i, self.get_group(edge[0]), edge[1][0]['label'])
+
+        for i in self.dfa.accept_states:
+            self.result.accept_states[self.get_group(i)] = self.dfa.accept_states[i]

@@ -1,8 +1,7 @@
-from typing import Callable
-
-from regex import RegexExpr
 import automata
 from automata import Automata
+from regex import RegexExpr
+from wrapper import CallWrapper
 
 
 def combine(fas: list[Automata]) -> Automata:
@@ -71,7 +70,7 @@ def kleene_closure(fa: Automata) -> Automata:
     return new_fa
 
 
-def from_regex_string(regexpr: RegexExpr, action: Callable) -> Automata:
+def from_regex_string(regexpr: RegexExpr, action: CallWrapper) -> Automata:
     stk: list[Automata] = []
     for c in regexpr.get_regex_chars():
         if not c.is_operator:

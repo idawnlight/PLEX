@@ -1,19 +1,10 @@
 from typing import Callable
 
-from regex import *
 import nfa
 from automata import Automata
-from dfa import DFA
-
-
-def call_wrapper(func):
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-
-    if callable(func):
-        return wrapper
-    else:
-        return lambda _: func
+from dfa import DFA, MinimalDFA
+from regex import *
+from wrapper import CallWrapper
 
 
 class Lex:
@@ -22,14 +13,16 @@ class Lex:
 
         self._table = {}
 
-    def _tokenize(self, source_code: str):
+        self.automata: Automata | None = None
+
+    def _init(self):
         # parse token specifications
         fas: list[Automata] = []
-        print("[+] From token specifications (RegExp) to NFAs...")
-        for rule in self.token_specification:
+        print(f"[+] From {len(self.token_specification)} token specifications (RegExp) to NFAs...")
+        for idx, rule in enumerate(self.token_specification):
             reg = RegexExpr(rule[0])
             # print(reg.get_regex_chars())
-            fas.append(nfa.from_regex_string(reg, call_wrapper(rule[1])))
+            fas.append(nfa.from_regex_string(reg, CallWrapper(rule[1], idx)))
             # print(rule[0])
             # fas[-1].debug_print()
         print("[+] Combining NFAs to a single one...")
@@ -38,5 +31,15 @@ class Lex:
         print("[+] From combined NFA to DFA...")
         dfa = DFA(combined_nfa)
         dfa.result.debug_print()
-        for i in dfa.result.accept_states:
-            print(i, dfa.result.accept_states[i](1))
+        # for i in dfa.result.accept_states:
+        #     print(i, dfa.result.accept_states[i](1))
+
+        print("[+] From DFA to minimal DFA...")
+        minimal_dfa = MinimalDFA(dfa.result)
+        minimal_dfa.result.debug_print()
+
+        self.automata = minimal_dfa.result
+
+    def tokenize(self, source_code: str):
+        print("[+] Executing minimal DFA...")
+        self.automata.execute(source_code)

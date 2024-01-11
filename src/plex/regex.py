@@ -82,17 +82,17 @@ class RegexExpr:
             previous_char = self._chars[i - 1]
             flag = (
                 # case 1: 2 non-operator chars, ab
-                (not previous_char.is_operator and not current_char.is_operator) or
-                # case 2: between non-operator and '(', a(
-                (not previous_char.is_operator and current_char.is_operator_char('(')) or
-                # case 3: between ')' and non-operator, )a
-                (previous_char.is_operator_char(')') and not current_char.is_operator) or
-                # case 4: between '*' and non-operator, *a
-                (previous_char.is_operator_char('*') and not current_char.is_operator) or
-                # case 5: between '*' and '(', *(
-                (previous_char.is_operator_char('*') and current_char.is_operator_char('(')) or
-                # case 6: between ')' and '(', )(
-                (previous_char.is_operator_char(')') and current_char.is_operator_char('('))
+                    (not previous_char.is_operator and not current_char.is_operator) or
+                    # case 2: between non-operator and '(', a(
+                    (not previous_char.is_operator and current_char.is_operator_char('(')) or
+                    # case 3: between ')' and non-operator, )a
+                    (previous_char.is_operator_char(')') and not current_char.is_operator) or
+                    # case 4: between '*' and non-operator, *a
+                    (previous_char.is_operator_char('*') and not current_char.is_operator) or
+                    # case 5: between '*' and '(', *(
+                    (previous_char.is_operator_char('*') and current_char.is_operator_char('(')) or
+                    # case 6: between ')' and '(', )(
+                    (previous_char.is_operator_char(')') and current_char.is_operator_char('('))
             )
 
             if flag:
@@ -115,7 +115,8 @@ class RegexExpr:
                         raise Exception("Invalid regex")
                     operator_stack.pop()
                 else:
-                    while len(operator_stack) > 0 and not operator_stack[-1].is_operator_char('(') and operator_stack[-1].compare(c) >= 0:
+                    while len(operator_stack) > 0 and not operator_stack[-1].is_operator_char('(') and operator_stack[
+                        -1].compare(c) >= 0:
                         postfix.append(operator_stack.pop())
                     operator_stack.append(c)
             else:

@@ -5,7 +5,18 @@
 groups = ["default"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:bdb22306a293ecbc5b55e258e519f29f3200f4e2cefead64ad5ba4779320a67a"
+content_hash = "sha256:83ac91a63c62685e87dd2315fdd86efb7270b4b2ae44c8215c4aca0a27ed92b0"
+
+[[package]]
+name = "dill"
+version = "0.3.7"
+requires_python = ">=3.7"
+summary = "serialize all of Python"
+groups = ["default"]
+files = [
+    {file = "dill-0.3.7-py3-none-any.whl", hash = "sha256:76b122c08ef4ce2eedcd4d1abd8e641114bfc6c2867f49f3c41facf65bf19f5e"},
+    {file = "dill-0.3.7.tar.gz", hash = "sha256:cc1c8b182eb3013e24bd475ff2e9295af86c1a38eb1aff128dac8962a9ce3c03"},
+]
 
 [[package]]
 name = "networkx"

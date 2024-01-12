@@ -1,7 +1,7 @@
 [project]
 name = "PLEX"
 version = "0.1.0"
-description = "Tiny LALR(1) Lexical Analyzer in Python"
+description = "Tiny Lexical Analyzer in Python"
 authors = [
     {name = "idawnlight", email = "idawn@live.com"},
 ]
@@ -16,3 +16,6 @@ license = {text = "MIT"}
 
 [tool.pdm]
 package-type = "library"
+
+[tool.pdm.scripts]
+plex = "python src/plex"

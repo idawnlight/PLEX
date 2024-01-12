@@ -127,14 +127,15 @@ class MinimalDFA:
         for state in self.dfa.graph:
             if state not in self.dfa.accept_states:
                 current_set.add(state)
-        self.groups.append(current_set)
+        if current_set != set(): self.groups.append(current_set)
 
-        # print("initial groups", self.groups)
+        print("initial groups", self.groups, "length", len(self.groups))
 
         # run with other symbols
         while True:
-            prev_groups = self.groups
+            prev_groups = []
             for symbol in self.dfa.symbols:
+                prev_groups = self.groups
                 new_groups = []
                 for group in prev_groups:
                     group_dict: dict[int, set[int]] = {}
@@ -145,21 +146,21 @@ class MinimalDFA:
                                 next_state = edge[0]
                                 break
                         if next_state is None:
-                            new_groups.append({state})
-                            continue
-                        next_group = self.get_group(next_state)
+                            next_group = -1
+                        else:
+                            next_group = self.get_group(next_state)
                         if next_group not in group_dict:
                             group_dict[next_group] = set()
                         group_dict[next_group].add(state)
                     for g in group_dict:
                         new_groups.append(group_dict[g])
-                # print("new groups", new_groups)
+                print("new groups", new_groups, "length", len(new_groups))
                 self.groups = new_groups
             if self.groups == prev_groups:
                 break
 
     def generate_result(self):
-        # print("final groups", self.groups)
+        print("final groups", self.groups, "length", len(self.groups))
         existing_set = set()
 
         for i in range(len(self.groups)):

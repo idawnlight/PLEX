@@ -22,6 +22,19 @@ int main() {
 }
 """
 
+test_input2 = """
+int main() {
+    while (loop == 0 && i <= 10) {
+        int j = 1;
+        while (loop == 0 && j < i)
+            if (a[i][j] == x)
+                loop = 1;
+            else
+                j = j + 1;
+    }
+}
+"""
+
 
 class MyLanguage(Lex):
     def __init__(self):
@@ -30,7 +43,7 @@ class MyLanguage(Lex):
         # define the token specification
         self.token_specification = [
             # ('(a)(b)*', 'TEST'),
-            # ('/', 'TEST2')
+            # ('/', 'TEST2'),
 
             ('\n| ( )*', self.count_whitespace),
 
@@ -48,6 +61,7 @@ class MyLanguage(Lex):
             (r'else', "ELSE"),
             (r'while', "WHILE"),
             (r'for', "FOR"),
+            (r'return', "RETURN"),
             (r'break', "BREAK"),
             (r'continue', "CONTINUE"),
 
@@ -105,4 +119,5 @@ if __name__ == '__main__':
     # language = dill.load(open("language.p", "rb"))
 
     language.tokenize(test_input)
-    print("\nAfter tokenize, whitespaces counted: " + str(language.whitespaces))
+    # language.tokenize("main while else if")
+    # print("\nAfter tokenize, whitespaces counted: " + str(language.whitespaces))

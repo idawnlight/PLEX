@@ -30,13 +30,13 @@ class Lex:
         # combined_nfa.debug_print()
         print("[+] From combined NFA to DFA...")
         dfa = DFA(combined_nfa)
-        dfa.result.debug_print()
+        # dfa.result.debug_print()
         # for i in dfa.result.accept_states:
         #     print(i, dfa.result.accept_states[i](1))
 
         print("[+] From DFA to minimal DFA...")
         minimal_dfa = MinimalDFA(dfa.result)
-        minimal_dfa.result.debug_print()
+        # minimal_dfa.result.debug_print()
 
         self.automata = minimal_dfa.result
 

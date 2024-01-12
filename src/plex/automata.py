@@ -37,42 +37,29 @@ class Automata:
 
     def execute(self, input_str: str) -> bool:
         pos = 0
-        current_state: list[int] = [self.start_state]
+        current_state: int = self.start_state
         token = ''
 
         def reset():
             nonlocal current_state, token
-            current_state = [self.start_state]
+            current_state = self.start_state
             token = ''
 
-        def find_next_single(state: int, char: str) -> list[int] | None:
-            nexts = []
+        def find_next(state: int, char: str) -> int | None:
             for edge in self.graph[state].items():
                 for label in edge[1].values():
                     if label['label'] == char:
-                        nexts.append(edge[0])
-            return nexts
-
-        def find_next(current_states: list[int], char: str) -> list[int] | None:
-            next_states = []
-            for state in current_states:
-                next_states.extend(find_next_single(state, char))
-            return list(set(next_states)) if next_states != [] else None
+                        return edge[0]
+            return None
 
         deal = lambda x: print(x) if x is not None else None
 
-        def check_and_call(current_state: list[int], token: str):
-            actions: list[CallWrapper] = []
-            for state in current_state:
-                if state in self.accept_states:
-                    actions.append(self.accept_states[state])
-
-            if len(actions) > 0 and token != '':
-                actions = sorted(actions, key=cmp_to_key(lambda x, y: x.priority - y.priority))
-                deal(actions[0](token))
+        def check_and_call(state: int, token: str):
+            if state in self.accept_states and token != '':
+                deal(self.accept_states[state](token))
                 reset()
             else:
-                raise Exception("Invalid input", input_str[pos])
+                raise Exception("Invalid state")
 
         while True:
             next_state = find_next(current_state, input_str[pos])

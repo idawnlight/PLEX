@@ -129,7 +129,7 @@ class MinimalDFA:
                 current_set.add(state)
         if current_set != set(): self.groups.append(current_set)
 
-        print("initial groups", self.groups, "length", len(self.groups))
+        # print("initial groups", self.groups, "length", len(self.groups))
 
         # run with other symbols
         while True:
@@ -154,13 +154,13 @@ class MinimalDFA:
                         group_dict[next_group].add(state)
                     for g in group_dict:
                         new_groups.append(group_dict[g])
-                print("new groups", new_groups, "length", len(new_groups))
+                # print("new groups", new_groups, "length", len(new_groups))
                 self.groups = new_groups
             if self.groups == prev_groups:
                 break
 
     def generate_result(self):
-        print("final groups", self.groups, "length", len(self.groups))
+        # print("final groups", self.groups, "length", len(self.groups))
         existing_set = set()
 
         for i in range(len(self.groups)):

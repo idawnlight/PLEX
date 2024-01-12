@@ -56,15 +56,6 @@ class MyLanguage(Lex):
             (r'[', "LBRACKET"),
             (r']', "RBRACKET"),
 
-            # keywords
-            (r'if', "IF"),
-            (r'else', "ELSE"),
-            (r'while', "WHILE"),
-            (r'for', "FOR"),
-            (r'return', "RETURN"),
-            (r'break', "BREAK"),
-            (r'continue', "CONTINUE"),
-
             # operators
             (r'\+', "PLUS"),
             (r'-', "MINUS"),
@@ -90,7 +81,7 @@ class MyLanguage(Lex):
             (r'\|\|', "OR"),
 
             # literals
-            (r'(A-Z|a-z|_)(A-Z|a-z|0-9|_)*', "identifier"),
+            (r'(A-Z|a-z|_)(A-Z|a-z|0-9|_)*', self.identifier),
             (r'(0-9)(0-9)*', self.parse_numeric),
             (r'(0-9)(0-9)*\.(0-9)(0-9)*', self.parse_numeric),
         ]
@@ -111,6 +102,13 @@ class MyLanguage(Lex):
         except ValueError:
             return "FLOAT: " + str(float(token))
 
+    def identifier(self, token):
+        if token in ["if", "else", "while", "for", "return", "break", "continue"]:
+            return "KEYWORD: " + token
+        if token in ['int', 'float', 'char', 'void']:
+            return "TYPE: " + token
+        return "IDENTIFIER: " + token
+
 
 if __name__ == '__main__':
     language = MyLanguage()
@@ -120,4 +118,4 @@ if __name__ == '__main__':
 
     language.tokenize(test_input)
     # language.tokenize("main while else if")
-    # print("\nAfter tokenize, whitespaces counted: " + str(language.whitespaces))
+    print("\nAfter tokenize, whitespaces counted: " + str(language.whitespaces))

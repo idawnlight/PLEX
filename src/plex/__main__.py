@@ -22,20 +22,6 @@ int main() {
 }
 """
 
-test_input2 = """
-int main() {
-    while (loop == 0 && i <= 10) {
-        int j = 1;
-        while (loop == 0 && j < i)
-            if (a[i][j] == x)
-                loop = 1;
-            else
-                j = j + 1;
-    }
-}
-"""
-
-
 class MyLanguage(Lex):
     def __init__(self):
         super().__init__()

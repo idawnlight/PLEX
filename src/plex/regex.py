@@ -14,13 +14,11 @@ class RegexChar:
         return self.char == c and self.is_operator
 
     def priority(self):
-        if self.char == '(':
-            raise Exception("Invalid operator")
         if self.is_operator_char('*'):
             return 3
-        if self.is_operator_char('|'):
-            return 2
         if self.is_operator_char('@'):
+            return 2
+        if self.is_operator_char('|'):
             return 1
         return 0
 

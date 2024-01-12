@@ -1,5 +1,3 @@
-from functools import cmp_to_key
-
 import networkx
 
 from wrapper import CallWrapper
